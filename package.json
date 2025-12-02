@@ -1,0 +1,43 @@
+{
+  "name": "wechat-article-downloader",
+  "type": "module",
+  "description": "批量下载微信公众号文章为PDF，支持多线程并发",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.js",
+  "bin": {
+    "wechat-downloader": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node test/test.js",
+    "example": "node examples/basic.js",
+    "verify": "node test-install.js"
+  },
+  "keywords": [
+    "wechat",
+    "article",
+    "downloader",
+    "pdf",
+    "puppeteer"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.13.2",
+    "cheerio": "^1.1.2",
+    "puppeteer": "^24.31.0",
+    "puppeteer-core": "^24.31.0",
+    "workerpool": "^10.0.1"
+  },
+  "engines": {
+    "node": ">=20.19.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.5.0",
+    "prettier": "^3.7.3"
+  }
+}
