@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // src/cli.js
-const WeChatArticleDownloader = require('./index')
-const path = require('path')
+import WeChatArticleDownloader from './index.js'
+import path from 'path'
 
 function parseArgs() {
   const args = process.argv.slice(2)
@@ -103,8 +103,6 @@ process.on('SIGINT', async () => {
   process.exit(0)
 })
 
-if (require.main === module) {
-  main().catch(console.error)
-}
+main().catch(console.error)
 
-module.exports = main
+export default main

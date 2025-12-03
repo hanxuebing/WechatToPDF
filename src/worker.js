@@ -1,17 +1,19 @@
 // src/worker.js - 支持 puppeteer-core 的版本
-const workerpool = require('workerpool')
-const path = require('path')
-const fs = require('fs')
+import workerpool from 'workerpool'
+import path from 'path'
+import fs from 'fs'
 
 // 自动检测使用 puppeteer 还是 puppeteer-core
 let puppeteer
 let usePuppeteerCore = false
 try {
-  puppeteer = require('puppeteer-core')
+  const puppeteerCore = await import('puppeteer-core')
+  puppeteer = puppeteerCore.default
   usePuppeteerCore = true
   console.log('使用 puppeteer-core')
 } catch (e) {
-  puppeteer = require('puppeteer')
+  const puppeteerModule = await import('puppeteer')
+  puppeteer = puppeteerModule.default
   console.log('使用 puppeteer')
 }
 
@@ -52,6 +54,9 @@ function getChromePath() {
   return null
 }
 
+// 模块级别缓存 Chrome 路径，避免重复检测
+const chromePath = usePuppeteerCore ? process.env.CHROME_PATH || getChromePath() : null
+
 // Worker中的下载函数
 async function downloadArticle(url, outputDir, filename) {
   let browser = null
@@ -73,8 +78,6 @@ async function downloadArticle(url, outputDir, filename) {
 
     // 如果使用 puppeteer-core，需要指定浏览器路径
     if (usePuppeteerCore) {
-      const chromePath = process.env.CHROME_PATH || getChromePath()
-
       if (chromePath) {
         launchOptions.executablePath = chromePath
         console.log(`使用 Chrome: ${chromePath}`)

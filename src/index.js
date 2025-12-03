@@ -1,9 +1,12 @@
 // src/index.js
-const fs = require('fs').promises
-const path = require('path')
-const workerpool = require('workerpool')
-const os = require('os')
-const cheerio = require('cheerio')
+import { promises as fs } from 'fs'
+import path from 'path'
+import workerpool from 'workerpool'
+import os from 'os'
+import * as cheerio from 'cheerio'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 class WeChatArticleDownloader {
   constructor(outputDir = './output', options = {}) {
@@ -124,4 +127,4 @@ class WeChatArticleDownloader {
   }
 }
 
-module.exports = WeChatArticleDownloader
+export default WeChatArticleDownloader
