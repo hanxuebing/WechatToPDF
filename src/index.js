@@ -12,6 +12,7 @@ class WeChatArticleDownloader {
   constructor(outputDir = './output', options = {}) {
     this.outputDir = outputDir
     this.maxWorkers = options.maxWorkers || Math.min(os.cpus().length, 4)
+    this.config = options.config || null
     this.pool = null
   }
 
@@ -35,7 +36,7 @@ class WeChatArticleDownloader {
     try {
       const tasks = urls.map((url, index) => {
         return this.pool
-          .exec('downloadArticle', [url, this.outputDir])
+          .exec('downloadArticle', [url, this.outputDir, null, this.config])
           .then((result) => {
             if (result.success) {
               console.log(`✓ [${index + 1}/${urls.length}] ${result.title}`)

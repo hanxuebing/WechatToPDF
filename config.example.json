@@ -1,0 +1,41 @@
+{
+  "_comment": "微信公众号文章下载器配置文件",
+  "_usage": "复制此文件为 config.json 并根据您的系统修改配置",
+  "chrome": {
+    "_comment": "Chrome浏览器配置",
+    "path": "",
+    "_examples": {
+      "windows": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "macos": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "linux": "/usr/bin/google-chrome-stable"
+    },
+    "args": [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-accelerated-2d-canvas",
+      "--disable-gpu",
+      "--no-first-run",
+      "--no-zygote",
+      "--single-process",
+      "--disable-blink-features=AutomationControlled"
+    ]
+  },
+  "download": {
+    "_comment": "下载配置",
+    "outputDir": "./output",
+    "maxWorkers": 4,
+    "timeout": 30000
+  },
+  "pdf": {
+    "_comment": "PDF生成配置",
+    "format": "A4",
+    "margin": {
+      "top": "20px",
+      "right": "20px",
+      "bottom": "20px",
+      "left": "20px"
+    },
+    "printBackground": true
+  }
+}

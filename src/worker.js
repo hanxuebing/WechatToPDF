@@ -58,29 +58,40 @@ function getChromePath() {
 const chromePath = usePuppeteerCore ? process.env.CHROME_PATH || getChromePath() : null
 
 // Worker中的下载函数
-async function downloadArticle(url, outputDir, filename) {
+async function downloadArticle(url, outputDir, filename, config) {
   let browser = null
 
   try {
+    // 使用配置文件中的Chrome参数，如果有的话
+    const defaultArgs = [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--disable-gpu',
+      '--no-first-run',
+      '--no-zygote',
+      '--single-process',
+      '--disable-blink-features=AutomationControlled',
+    ]
+
     const launchOptions = {
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--disable-gpu',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-blink-features=AutomationControlled',
-      ],
+      args: config?.chrome?.args || defaultArgs,
     }
 
-    // 如果使用 puppeteer-core，需要指定浏览器路径
+    // Chrome路径优先级：配置文件 > 环境变量 > 自动检测
+    let finalChromePath = chromePath
+
     if (usePuppeteerCore) {
-      if (chromePath) {
-        launchOptions.executablePath = chromePath
-        console.log(`使用 Chrome: ${chromePath}`)
+      if (config?.chrome?.path) {
+        finalChromePath = config.chrome.path
+        console.log(`使用配置文件中的Chrome路径: ${finalChromePath}`)
+      } else if (chromePath) {
+        console.log(`使用检测到的Chrome路径: ${chromePath}`)
+      }
+
+      if (finalChromePath) {
+        launchOptions.executablePath = finalChromePath
       } else {
         // 如果找不到 Chrome，尝试使用系统安装的 Chrome
         try {
@@ -89,7 +100,8 @@ async function downloadArticle(url, outputDir, filename) {
         } catch (fallbackError) {
           throw new Error(
             'puppeteer-core 需要指定 Chrome 路径。\n' +
-              '请设置环境变量: export CHROME_PATH=/path/to/chrome\n' +
+              '请在配置文件中设置 chrome.path\n' +
+              '或设置环境变量: export CHROME_PATH=/path/to/chrome\n' +
               '或安装 Chrome: npx puppeteer browsers install chrome\n' +
               '或者降级使用 puppeteer 替代 puppeteer-core',
           )
@@ -132,8 +144,8 @@ async function downloadArticle(url, outputDir, filename) {
     const safeFilename = sanitizeFilename(filename || title)
     const pdfPath = path.join(outputDir, `${safeFilename}.pdf`)
 
-    await page.pdf({
-      path: pdfPath,
+    // 使用配置文件中的PDF参数，如果有的话
+    const defaultPdfOptions = {
       format: 'A4',
       margin: {
         top: '20px',
@@ -142,7 +154,19 @@ async function downloadArticle(url, outputDir, filename) {
         left: '20px',
       },
       printBackground: true,
-    })
+    }
+
+    const pdfOptions = {
+      path: pdfPath,
+      format: config?.pdf?.format || defaultPdfOptions.format,
+      margin: config?.pdf?.margin || defaultPdfOptions.margin,
+      printBackground:
+        config?.pdf?.printBackground !== undefined
+          ? config.pdf.printBackground
+          : defaultPdfOptions.printBackground,
+    }
+
+    await page.pdf(pdfOptions)
 
     await page.close()
 
